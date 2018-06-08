@@ -21,7 +21,7 @@ pub struct RunningState {
 }
 
 #[derive(Debug)]
-pub enum State {
+pub enum Game {
     NotStarted,
     Running(RunningState),
     Finished(i32),
@@ -30,13 +30,13 @@ pub enum State {
 pub const GAME_LEVEL: i32 = 5;
 pub const GRID_SIZE: i32 = 32;
 
-pub fn new() -> State {
-    State::NotStarted
+pub fn new() -> Game {
+    Game::NotStarted
 }
 
-impl State {
-    pub fn start(&self) -> State {
-        State::Running(RunningState {
+impl Game {
+    pub fn start(&self) -> Game {
+        Game::Running(RunningState {
             direction: Direction::Right,
             snake: vec![Position(0, 0)],
             marker: None,
@@ -47,8 +47,8 @@ impl State {
     pub fn tick(&mut self, counter: &mut i32) {
         *counter += 1;
         match self {
-            State::NotStarted => println!("Not Started"),
-            State::Running(state) => {
+            Game::NotStarted => println!("Not Started"),
+            Game::Running(state) => {
                 let (snake, collected_marker) = update_snake(&state);
                 if collected_marker || (*counter % (GAME_LEVEL * 5)) == 0 {
                     state.collected += 1;
@@ -57,12 +57,12 @@ impl State {
                 };
                 state.snake = snake;
             }
-            State::Finished(_) => println!("Game Ended"),
+            Game::Finished(_) => println!("Game Ended"),
         }
     }
 
     pub fn change_direction(&mut self, direction: &Option<Direction>) {
-        if let (State::Running(state), Some(direction)) = (self, direction) {
+        if let (Game::Running(state), Some(direction)) = (self, direction) {
             state.direction = direction.to_owned()
         }
     }
@@ -71,8 +71,8 @@ impl State {
         clear([1.0; 4], graphics);
 
         match self {
-            State::NotStarted => println!("Do nothing"),
-            State::Running(state) => {
+            Game::NotStarted => println!("Do nothing"),
+            Game::Running(state) => {
                 for item in &state.snake {
                     let x = (item.0 as f64) * 10.0;
                     let y = (item.1 as f64) * 10.0;
@@ -95,7 +95,7 @@ impl State {
                     );
                 }
             }
-            State::Finished(_) => println!("Finished"),
+            Game::Finished(_) => println!("Finished"),
         }
     }
 }
