@@ -6,7 +6,7 @@ mod game;
 use piston_window::*;
 
 fn main() {
-    let mut state = game::start_game();
+    let mut game = game::new().start();
 
     let mut window: PistonWindow = WindowSettings::new("Snakes", [640, 480])
         .exit_on_esc(true)
@@ -25,14 +25,14 @@ fn main() {
             _ => None,
         };
 
-        game::change_direction(&mut state, &direction);
+        game.change_direction(&direction);
 
         if let Some(_) = event.update_args() {
-            game::tick(&mut state, &mut marker_timer);
+            game.tick(&mut marker_timer);
         }
 
         window.draw_2d(&event, |context, graphics| {
-            game::render(&state, context, graphics);
+            game.render(context, graphics);
         });
     }
 }

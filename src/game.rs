@@ -30,35 +30,73 @@ pub enum State {
 pub const GAME_LEVEL: i32 = 5;
 pub const GRID_SIZE: i32 = 32;
 
-pub fn start_game() -> State {
-    State::Running(RunningState {
-        direction: Direction::Right,
-        snake: vec![Position(0, 0)],
-        marker: None,
-        collected: 0,
-    })
+pub fn new() -> State {
+    State::NotStarted
 }
 
-pub fn tick(state: &mut State, counter: &mut i32) {
-    *counter += 1;
-    match state {
-        State::NotStarted => println!("Not Started"),
-        State::Running(state) => {
-            let (snake, collected_marker) = update_snake(&state);
-            if collected_marker || (*counter % (GAME_LEVEL * 5)) == 0 {
-                state.collected += 1;
-                *counter = 0;
-                state.marker = Some(spawn_marker(&snake))
-            };
-            state.snake = snake;
-        }
-        State::Finished(_) => println!("Game Ended"),
+impl State {
+    pub fn start(&self) -> State {
+        State::Running(RunningState {
+            direction: Direction::Right,
+            snake: vec![Position(0, 0)],
+            marker: None,
+            collected: 0,
+        })
     }
-}
 
-pub fn change_direction(state: &mut State, direction: &Option<Direction>) {
-    if let (State::Running(state), Some(direction)) = (state, direction) {
-        state.direction = direction.to_owned()
+    pub fn tick(&mut self, counter: &mut i32) {
+        *counter += 1;
+        match self {
+            State::NotStarted => println!("Not Started"),
+            State::Running(state) => {
+                let (snake, collected_marker) = update_snake(&state);
+                if collected_marker || (*counter % (GAME_LEVEL * 5)) == 0 {
+                    state.collected += 1;
+                    *counter = 0;
+                    state.marker = Some(spawn_marker(&snake))
+                };
+                state.snake = snake;
+            }
+            State::Finished(_) => println!("Game Ended"),
+        }
+    }
+
+    pub fn change_direction(&mut self, direction: &Option<Direction>) {
+        if let (State::Running(state), Some(direction)) = (self, direction) {
+            state.direction = direction.to_owned()
+        }
+    }
+
+    pub fn render(&self, context: Context, graphics: &mut G2d) {
+        clear([1.0; 4], graphics);
+
+        match self {
+            State::NotStarted => println!("Do nothing"),
+            State::Running(state) => {
+                for item in &state.snake {
+                    let x = (item.0 as f64) * 10.0;
+                    let y = (item.1 as f64) * 10.0;
+                    rectangle(
+                        [0.0, 0.0, 0.0, 1.0], // red
+                        [x, y, 10.0, 10.0],
+                        context.transform,
+                        graphics,
+                    );
+                }
+
+                if let Some(marker) = &state.marker {
+                    let x = (marker.0 as f64) * 10.0;
+                    let y = (marker.1 as f64) * 10.0;
+                    rectangle(
+                        [1.0, 0.0, 0.0, 1.0], // red
+                        [x, y, 10.0, 10.0],
+                        context.transform,
+                        graphics,
+                    );
+                }
+            }
+            State::Finished(_) => println!("Finished"),
+        }
     }
 }
 
@@ -105,36 +143,4 @@ fn random_position() -> Position {
         rng.to_owned().gen_range(0, GRID_SIZE),
         rng.to_owned().gen_range(0, GRID_SIZE).clone(),
     )
-}
-
-pub fn render(state: &State, context: Context, graphics: &mut G2d) {
-    clear([1.0; 4], graphics);
-
-    match state {
-        State::NotStarted => println!("Do nothing"),
-        State::Running(state) => {
-            for item in &state.snake {
-                let x = (item.0 as f64) * 10.0;
-                let y = (item.1 as f64) * 10.0;
-                rectangle(
-                    [0.0, 0.0, 0.0, 1.0], // red
-                    [x, y, 10.0, 10.0],
-                    context.transform,
-                    graphics,
-                );
-            }
-
-            if let Some(marker) = &state.marker {
-                let x = (marker.0 as f64) * 10.0;
-                let y = (marker.1 as f64) * 10.0;
-                rectangle(
-                    [1.0, 0.0, 0.0, 1.0], // red
-                    [x, y, 10.0, 10.0],
-                    context.transform,
-                    graphics,
-                );
-            }
-        }
-        State::Finished(_) => println!("Finished"),
-    }
 }
