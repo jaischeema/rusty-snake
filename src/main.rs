@@ -4,7 +4,7 @@ extern crate rand;
 use piston_window::*;
 use rand::prelude::*;
 
-const GRID_SIZE: i32 = 64;
+const GRID_SIZE: i32 = 32;
 
 #[derive(Debug, Clone)]
 enum Direction {
@@ -33,12 +33,6 @@ struct RunningState {
     collected: i32,
 }
 
-#[derive(Debug)]
-enum State {
-    Running(RunningState),
-    Finished(i32),
-}
-
 fn main() {
     let mut state = RunningState {
         direction: Direction::Right,
@@ -52,7 +46,9 @@ fn main() {
         .build()
         .unwrap();
 
-    window.set_ups(3);
+    let level = 10;
+    let mut marker_timer = 0;
+    window.set_ups(level);
 
     while let Some(event) = window.next() {
         let direction = match event.press_args() {
@@ -69,15 +65,19 @@ fn main() {
         };
 
         if let Some(_) = event.update_args() {
-            let snake = update_snake(&state.snake, &state.direction);
-            // Check if collision
-            // Check if collected the marker
-
-            println!("{:?}", snake);
+            marker_timer += 1;
+            let (snake, collected_marker) = update_snake(&state);
+            let marker = if collected_marker || (marker_timer % (level * 5)) == 0 {
+                state.collected += 1;
+                marker_timer = 0;
+                Some(spawn_marker(&snake))
+            } else {
+                state.marker
+            };
 
             state = RunningState {
                 snake: snake,
-                marker: Some(random_position()),
+                marker: marker,
                 ..state
             };
         }
@@ -110,14 +110,31 @@ fn main() {
     }
 }
 
-fn update_snake(snake: &Vec<Position>, direction: &Direction) -> Vec<Position> {
-    if let Some(element) = snake.first() {
-        let mut updated = snake.clone();
-        updated.insert(0, increment_position(element, direction));
-        // updated.pop(); TODO: Reinstate this with logic to not do this when we hit the marker
-        updated
+fn spawn_marker(snake: &Vec<Position>) -> Position {
+    let marker = random_position();
+    if snake.contains(&marker) {
+        spawn_marker(snake)
     } else {
-        vec![Position(0, 0)]
+        marker
+    }
+}
+
+fn update_snake(state: &RunningState) -> (Vec<Position>, bool) {
+    if let Some(element) = state.snake.first() {
+        let mut updated = state.snake.clone();
+        let head = increment_position(element, &state.direction);
+        let collected_marker = if let Some(existing_marker) = &state.marker {
+            existing_marker == &head
+        } else {
+            false
+        };
+        updated.insert(0, head);
+        if !collected_marker {
+            updated.pop();
+        }
+        (updated, collected_marker)
+    } else {
+        (vec![Position(0, 0)], false)
     }
 }
 
