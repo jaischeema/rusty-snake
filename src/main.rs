@@ -25,7 +25,7 @@ fn main() {
             _ => None,
         };
 
-        game.change_direction(&direction);
+        game.change_direction(direction);
 
         if let Some(_) = event.update_args() {
             marker_timer = game.tick(marker_timer);

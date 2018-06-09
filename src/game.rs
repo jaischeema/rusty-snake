@@ -62,9 +62,11 @@ impl Game {
         local_counter
     }
 
-    pub fn change_direction(&mut self, direction: &Option<Direction>) {
-        if let (Game::Running(state), Some(direction)) = (self, direction) {
-            state.direction = direction.to_owned()
+    pub fn change_direction(&mut self, direction: Option<Direction>) {
+        if let Game::Running(state) = self {
+            if let Some(direction) = direction {
+                state.direction = direction
+            }
         }
     }
 
