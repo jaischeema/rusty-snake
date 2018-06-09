@@ -44,21 +44,22 @@ impl Game {
         })
     }
 
-    pub fn tick(&mut self, counter: &mut i32) {
-        *counter += 1;
+    pub fn tick(&mut self, counter: i32) -> i32 {
+        let mut local_counter = counter + 1;
         match self {
             Game::NotStarted => println!("Not Started"),
             Game::Running(state) => {
                 let (snake, collected_marker) = update_snake(&state);
-                if collected_marker || (*counter % (GAME_LEVEL * 5)) == 0 {
+                if collected_marker || local_counter % (GAME_LEVEL * 5) == 0 {
                     state.collected += 1;
-                    *counter = 0;
+                    local_counter = 0;
                     state.marker = Some(spawn_marker(&snake))
                 };
                 state.snake = snake;
             }
             Game::Finished(_) => println!("Game Ended"),
         }
+        local_counter
     }
 
     pub fn change_direction(&mut self, direction: &Option<Direction>) {

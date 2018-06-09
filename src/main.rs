@@ -28,7 +28,7 @@ fn main() {
         game.change_direction(&direction);
 
         if let Some(_) = event.update_args() {
-            game.tick(&mut marker_timer);
+            marker_timer = game.tick(marker_timer);
         }
 
         window.draw_2d(&event, |context, graphics| {
