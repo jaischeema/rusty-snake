@@ -12,10 +12,12 @@ pub enum Direction {
 #[derive(Clone, Debug, PartialEq)]
 pub struct Position(i32, i32);
 
+type Snake = Vec<Position>;
+
 #[derive(Debug, Clone)]
 pub struct RunningState {
     direction: Direction,
-    snake: Vec<Position>,
+    snake: Snake,
     marker: Option<Position>,
     collected: i32,
 }
@@ -49,13 +51,16 @@ impl Game {
         match self {
             Game::NotStarted => println!("Not Started"),
             Game::Running(state) => {
-                let (snake, collected_marker) = update_snake(&state);
+                let (snake, collected_marker, collision) = update_snake(&state);
                 if collected_marker || local_counter % (GAME_LEVEL * 5) == 0 {
                     state.collected += 1;
                     local_counter = 0;
                     state.marker = Some(spawn_marker(&snake))
                 };
                 state.snake = snake;
+                if collision {
+                    *self = Game::Finished(state.collected);
+                }
             }
             Game::Finished(_) => println!("Game Ended"),
         }
@@ -103,7 +108,7 @@ impl Game {
     }
 }
 
-fn spawn_marker(snake: &Vec<Position>) -> Position {
+fn spawn_marker(snake: &Snake) -> Position {
     let marker = random_position();
     if snake.contains(&marker) {
         spawn_marker(snake)
@@ -112,7 +117,7 @@ fn spawn_marker(snake: &Vec<Position>) -> Position {
     }
 }
 
-fn update_snake(state: &RunningState) -> (Vec<Position>, bool) {
+fn update_snake(state: &RunningState) -> (Snake, bool, bool) {
     if let Some(element) = state.snake.first() {
         let mut updated = state.snake.clone();
         let head = increment_position(element, &state.direction);
@@ -121,14 +126,21 @@ fn update_snake(state: &RunningState) -> (Vec<Position>, bool) {
         } else {
             false
         };
-        updated.insert(0, head);
         if !collected_marker {
             updated.pop();
         }
-        (updated, collected_marker)
+        let collision = updated.contains(&head) || outside_boundary(&head);
+        updated.insert(0, head);
+        (updated, collected_marker, collision)
     } else {
-        (vec![Position(0, 0)], false)
+        (vec![Position(0, 0)], false, false)
     }
+}
+
+fn outside_boundary(position: &Position) -> bool {
+    let x = position.0;
+    let y = position.1;
+    x < 0 || x >= GRID_SIZE || y < 0 || y > GRID_SIZE
 }
 
 fn increment_position(position: &Position, direction: &Direction) -> Position {
