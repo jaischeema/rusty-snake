@@ -1,7 +1,7 @@
 use piston_window::*;
 use rand::prelude::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, PartialEq)]
 pub enum Direction {
     Up,
     Down,
@@ -14,7 +14,7 @@ pub struct Position(i32, i32);
 
 type Snake = Vec<Position>;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct RunningState {
     direction: Direction,
     snake: Snake,
@@ -107,22 +107,22 @@ impl Game {
             Game::NotStarted => println!("Do nothing"),
             Game::Running(state) => {
                 for item in &state.snake {
-                    let x = (item.0 as f64) * 10.0;
-                    let y = (item.1 as f64) * 10.0;
+                    let x = (item.0 as f64) * GRID_PIXEL_SIZE;
+                    let y = (item.1 as f64) * GRID_PIXEL_SIZE;
                     rectangle(
                         [0.0, 0.0, 0.0, 1.0], // red
-                        [x, y, 10.0, 10.0],
+                        [x, y, GRID_PIXEL_SIZE, GRID_PIXEL_SIZE],
                         context.transform,
                         graphics,
                     );
                 }
 
                 if let Some(marker) = &state.marker {
-                    let x = (marker.0 as f64) * 10.0;
-                    let y = (marker.1 as f64) * 10.0;
+                    let x = (marker.0 as f64) * GRID_PIXEL_SIZE;
+                    let y = (marker.1 as f64) * GRID_PIXEL_SIZE;
                     rectangle(
                         [1.0, 0.0, 0.0, 1.0], // red
-                        [x, y, 10.0, 10.0],
+                        [x, y, GRID_PIXEL_SIZE, GRID_PIXEL_SIZE],
                         context.transform,
                         graphics,
                     );
