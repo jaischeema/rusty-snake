@@ -29,7 +29,7 @@ pub enum Game {
     Finished(i32),
 }
 
-pub const GAME_LEVEL: i32 = 5;
+pub const GAME_LEVEL: i32 = 15;
 pub const GRID_SIZE: i32 = 32;
 pub const GRID_PIXEL_SIZE: f64 = 10.0;
 
@@ -41,7 +41,15 @@ impl Game {
     pub fn start(&self) -> Game {
         Game::Running(RunningState {
             direction: Direction::Right,
-            snake: vec![Position(0, 0)],
+            snake: vec![
+                Position(10, 10),
+                Position(10, 11),
+                Position(10, 12),
+                Position(10, 13),
+                Position(10, 14),
+                Position(10, 15),
+                Position(10, 16),
+            ],
             marker: None,
             collected: 0,
         })
