@@ -120,7 +120,7 @@ impl Game {
                     let x = (item.0 as f64) * GRID_PIXEL_SIZE;
                     let y = (item.1 as f64) * GRID_PIXEL_SIZE;
                     rectangle(
-                        [0.0, 0.0, 0.0, 1.0], // red
+                        [0.0, 0.0, 0.0, 1.0],
                         [x, y, GRID_PIXEL_SIZE, GRID_PIXEL_SIZE],
                         context.transform,
                         graphics,
@@ -137,10 +137,19 @@ impl Game {
                         graphics,
                     );
                 }
+
+                let transform = context.transform.trans(100.0, 400.0);
+                text::Text::new_color([0.64, 0.11, 0.11, 1.0], 32).draw(
+                    &format!("Score: {}", &state.collected),
+                    glyphs,
+                    &context.draw_state,
+                    transform,
+                    graphics,
+                );
             }
             Game::Finished(_) => {
-                let transform = context.transform.trans(10.0, 100.0);
-                text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32).draw(
+                let transform = context.transform.trans(30.0, 100.0);
+                text::Text::new_color([0.64, 0.11, 0.11, 1.0], 32).draw(
                     "Game Finished!",
                     glyphs,
                     &context.draw_state,
