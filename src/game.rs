@@ -69,8 +69,20 @@ impl Game {
 
     pub fn change_direction(&mut self, direction: Option<Direction>) {
         if let Game::Running(state) = self {
-            if let Some(direction) = direction {
-                state.direction = direction
+            match direction {
+                Some(Direction::Up) => if state.direction != Direction::Down {
+                    state.direction = Direction::Up
+                },
+                Some(Direction::Down) => if state.direction != Direction::Up {
+                    state.direction = Direction::Down
+                },
+                Some(Direction::Left) => if state.direction != Direction::Right {
+                    state.direction = Direction::Left
+                },
+                Some(Direction::Right) => if state.direction != Direction::Left {
+                    state.direction = Direction::Right
+                },
+                None => (),
             }
         }
     }
