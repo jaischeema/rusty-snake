@@ -184,7 +184,7 @@ fn update_snake(state: &RunningState) -> (Snake, bool, bool) {
 fn outside_boundary(position: &Position) -> bool {
     let x = position.0;
     let y = position.1;
-    x < 0 || x >= GRID_SIZE || y < 0 || y > GRID_SIZE
+    x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE
 }
 
 fn increment_position(position: &Position, direction: &Direction) -> Position {
