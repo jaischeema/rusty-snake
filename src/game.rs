@@ -61,8 +61,10 @@ impl Game {
             Game::NotStarted => println!("Not Started"),
             Game::Running(state) => {
                 let (snake, collected_marker, collision) = update_snake(&state);
-                if collected_marker || local_counter % (GAME_LEVEL * 5) == 0 {
+                if collected_marker {
                     state.collected += 1;
+                }
+                if collected_marker || local_counter % (GAME_LEVEL * 5) == 0 {
                     local_counter = 0;
                     state.marker = Some(spawn_marker(&snake))
                 };
