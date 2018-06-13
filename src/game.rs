@@ -31,6 +31,7 @@ pub enum Game {
 
 pub const GAME_LEVEL: i32 = 5;
 pub const GRID_SIZE: i32 = 32;
+pub const GRID_PIXEL_SIZE: f64 = 10.0;
 
 pub fn new() -> Game {
     Game::NotStarted
@@ -90,6 +91,18 @@ impl Game {
     pub fn render(&self, context: Context, graphics: &mut G2d, glyphs: &mut Glyphs) {
         clear([1.0; 4], graphics);
 
+        let grid_size = GRID_SIZE as f64;
+        rectangle(
+            [0.86, 0.86, 0.86, 0.8],
+            [
+                0.0,
+                0.0,
+                GRID_PIXEL_SIZE * grid_size,
+                GRID_PIXEL_SIZE * grid_size,
+            ],
+            context.transform,
+            graphics,
+        );
         match self {
             Game::NotStarted => println!("Do nothing"),
             Game::Running(state) => {
