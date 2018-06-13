@@ -1,3 +1,4 @@
+extern crate find_folder;
 extern crate piston_window;
 extern crate rand;
 
@@ -16,6 +17,14 @@ fn main() {
     let mut marker_timer = 0;
     window.set_ups(game::GAME_LEVEL as u64);
 
+    let assets = find_folder::Search::ParentsThenKids(3, 3)
+        .for_folder("assets")
+        .unwrap();
+    let font = &assets.join("SpaceMono-Regular.ttf");
+    let factory = window.factory.clone();
+    let texture_settings = TextureSettings::new();
+    let mut glyphs = Glyphs::new(font, factory, texture_settings).unwrap();
+
     while let Some(event) = window.next() {
         let direction = match event.press_args() {
             Some(Button::Keyboard(Key::Up)) => Some(game::Direction::Up),
@@ -32,7 +41,7 @@ fn main() {
         }
 
         window.draw_2d(&event, |context, graphics| {
-            game.render(context, graphics);
+            game.render(context, graphics, &mut glyphs);
         });
     }
 }

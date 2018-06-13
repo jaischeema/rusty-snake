@@ -75,7 +75,7 @@ impl Game {
         }
     }
 
-    pub fn render(&self, context: Context, graphics: &mut G2d) {
+    pub fn render(&self, context: Context, graphics: &mut G2d, glyphs: &mut Glyphs) {
         clear([1.0; 4], graphics);
 
         match self {
@@ -103,7 +103,16 @@ impl Game {
                     );
                 }
             }
-            Game::Finished(_) => println!("Finished"),
+            Game::Finished(_) => {
+                let transform = context.transform.trans(10.0, 100.0);
+                text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32).draw(
+                    "Game Finished!",
+                    glyphs,
+                    &context.draw_state,
+                    transform,
+                    graphics,
+                );
+            }
         }
     }
 }
