@@ -1,7 +1,7 @@
 use piston_window::*;
 use rand::prelude::*;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq)]
 pub enum Direction {
     Up,
     Down,
@@ -14,7 +14,7 @@ pub struct Position(i32, i32);
 
 type Snake = Vec<Position>;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct RunningState {
     direction: Direction,
     snake: Snake,
@@ -62,21 +62,20 @@ impl Game {
                 println!("Not Started");
                 (self, local_counter)
             }
-            Game::Running(state) => {
-                let mut new_state = state.clone();
+            Game::Running(mut state) => {
                 let (snake, collected_marker, collision) = update_snake(&state);
                 if collected_marker {
-                    new_state.collected += 1;
+                    state.collected += 1;
                 }
                 if collected_marker || local_counter % (GAME_LEVEL * 5) == 0 {
                     local_counter = 0;
-                    new_state.marker = Some(spawn_marker(&snake))
+                    state.marker = Some(spawn_marker(&snake))
                 };
-                new_state.snake = snake;
+                state.snake = snake;
                 if collision {
                     (Game::Finished(state.collected), local_counter)
                 } else {
-                    (Game::Running(new_state), local_counter)
+                    (Game::Running(state), local_counter)
                 }
             }
             Game::Finished(_) => {
