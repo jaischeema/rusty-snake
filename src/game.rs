@@ -1,7 +1,7 @@
 use piston_window::*;
 use rand::prelude::*;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Direction {
     Up,
     Down,
@@ -14,7 +14,7 @@ pub struct Position(i32, i32);
 
 type Snake = Vec<Position>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RunningState {
     direction: Direction,
     snake: Snake,
@@ -55,27 +55,35 @@ impl Game {
         })
     }
 
-    pub fn tick(&mut self, counter: i32) -> i32 {
+    pub fn tick(self, counter: i32) -> (Game, i32) {
         let mut local_counter = counter + 1;
         match self {
-            Game::NotStarted => println!("Not Started"),
+            Game::NotStarted => {
+                println!("Not Started");
+                (self, local_counter)
+            }
             Game::Running(state) => {
+                let mut new_state = state.clone();
                 let (snake, collected_marker, collision) = update_snake(&state);
                 if collected_marker {
-                    state.collected += 1;
+                    new_state.collected += 1;
                 }
                 if collected_marker || local_counter % (GAME_LEVEL * 5) == 0 {
                     local_counter = 0;
-                    state.marker = Some(spawn_marker(&snake))
+                    new_state.marker = Some(spawn_marker(&snake))
                 };
-                state.snake = snake;
+                new_state.snake = snake;
                 if collision {
-                    *self = Game::Finished(state.collected);
+                    (Game::Finished(state.collected), local_counter)
+                } else {
+                    (Game::Running(new_state), local_counter)
                 }
             }
-            Game::Finished(_) => println!("Game Ended"),
+            Game::Finished(_) => {
+                println!("Game Ended");
+                (self, local_counter)
+            }
         }
-        local_counter
     }
 
     pub fn change_direction(&mut self, direction: Option<Direction>) {

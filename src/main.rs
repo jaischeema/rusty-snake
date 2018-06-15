@@ -37,7 +37,9 @@ fn main() {
         game.change_direction(direction);
 
         if let Some(_) = event.update_args() {
-            marker_timer = game.tick(marker_timer);
+            let (new_state, updated_marker) = game.tick(marker_timer);
+            game = new_state;
+            marker_timer = updated_marker;
         }
 
         window.draw_2d(&event, |context, graphics| {
