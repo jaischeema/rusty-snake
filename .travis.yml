@@ -20,8 +20,7 @@ matrix:
       os: osx
 
     # *BSD
-    - env: TARGET=x86_64-unknown-freebsd DISABLE_TESTS=1
-    - env: TARGET=x86_64-unknown-netbsd DISABLE_TESTS=1
+    - env: TARGET=x86_64-unknown-freebsd
 
     # Testing other channels
     - env: TARGET=x86_64-unknown-linux-gnu
